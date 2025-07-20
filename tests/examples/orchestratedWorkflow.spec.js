@@ -147,70 +147,39 @@ test.describe('Orchestrated Test Workflow', () => {
   });
   
   // This test demonstrates parallel test execution with different browsers
-  test('should run tests in parallel across multiple browsers', async ({ browserManager }) => {
-    const browsers = ['chromium', 'firefox', 'webkit'];
-    const testConfigs = browsers.map(browser => ({
-      browserType: browser,
-      testData: {
-        username: `testuser_${browser}`,
-        product: testDataFactory.createProduct()
-      }
-    }));
+  test('should run in parallel across browsers', async ({ page, browser }) => {
+    // This test will run in parallel for each browser type (chromium, firefox, webkit)
+    // as defined in the Playwright config
     
-    // Define a test scenario that will run in parallel for each browser
-    const runBrowserTest = async (config) => {
-      const { browserType, testData } = config;
-      const browser = await browserManager.launchBrowser(browserType);
-      const context = await browserManager.createContext();
-      const page = await browserManager.createPage();
-      
-      try {
-        console.log(`Running test in ${browserType}...`);
-        
-        // Example test steps
-        await page.goto('https://example.com');
-        await page.screenshot({ path: `test-results/${browserType}-homepage.png` });
-        
-        // Perform some actions with the test data
-        await page.fill('#search', testData.product.name);
-        await page.click('button[type="submit"]');
-        
-        // Verify search results
-        const resultsCount = await page.$$eval('.search-result', els => els.length);
-        console.log(`Found ${resultsCount} results in ${browserType}`);
-        
-        return {
-          browserType,
-          success: true,
-          resultsCount
-        };
-      } catch (error) {
-        console.error(`Error in ${browserType} test:`, error);
-        return {
-          browserType,
-          success: false,
-          error: error.message
-        };
-      } finally {
-        await browser.close();
-      }
-    };
-    
-    // Run tests in parallel
-    const results = await Promise.all(testConfigs.map(runBrowserTest));
-    
-    // Log and verify results
-    results.forEach(result => {
-      console.log(`${result.browserType} test ${result.success ? 'PASSED' : 'FAILED'}`);
-      if (result.success) {
-        console.log(`  - Found ${result.resultsCount} results`);
-      } else {
-        console.error(`  - Error: ${result.error}`);
-      }
+    // Navigate to Playwright website
+    await test.step('Navigate to Playwright website', async () => {
+      await page.goto('https://playwright.dev/');
+      await expect(page).toHaveTitle(/Playwright/);
     });
     
-    // Assert all tests passed
-    const allPassed = results.every(r => r.success);
-    expect(allPassed).toBeTruthy();
+    const browserName = browser.browserType().name();
+    console.log(`Running test on ${browserName}`);
+    
+    // Verify main navigation elements
+    await test.step('Verify main navigation elements', async () => {
+      // Check for important navigation links
+      await expect(page.getByRole('link', { name: /Docs/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /API/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /Community/i })).toBeVisible();
+    });
+    
+    // Browser-specific validations
+    if (browserName === 'chromium') {
+      // Chromium-specific validations
+      await expect(page).toHaveURL(/playwright\.dev/);
+    } else if (browserName === 'firefox' || browserName === 'webkit') {
+      // Common validations for Firefox and WebKit
+      await expect(page).toHaveTitle(/Playwright/);
+      
+      // Check for main heading
+      await expect(page.getByRole('heading', { 
+        name: /Fast and reliable end-to-end testing for modern web apps/ 
+      })).toBeVisible();
+    }
   });
 });

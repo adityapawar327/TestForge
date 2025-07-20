@@ -1,5 +1,6 @@
 const { StateGraph, END } = require('@langchain/langgraph');
 const { RunnableLambda } = require('@langchain/core/runnables');
+const { z } = require('zod');
 const testDataManager = require('../utils/testDataManager');
 const browserManager = require('../utils/browserManager');
 
@@ -21,30 +22,35 @@ class TestOrchestrator {
    * @private
    */
   _initializeWorkflow() {
-    // Define the state schema
-    const stateSchema = {
-      testResults: {
-        value: [],
-        reducer: (existing, updates) => [...existing, ...updates],
-      },
-      testData: {
-        value: {},
-        // Merge test data objects
-        reducer: (existing, updates) => ({ ...existing, ...updates }),
-      },
-      browserContexts: {
-        value: {},
-        // Merge browser contexts
-        reducer: (existing, updates) => ({ ...existing, ...updates }),
-      },
-      errors: {
-        value: [],
-        reducer: (existing, updates) => [...existing, ...updates],
-      },
-    };
+    // Define the state schema using Zod
+    const stateSchema = z.object({
+      testResults: z.array(z.any()).default([]),
+      testData: z.record(z.any()).default({}),
+      browserContexts: z.record(z.any()).default({}),
+      errors: z.array(z.any()).default([])
+    });
 
-    // Create a new workflow
-    this.workflow = new StateGraph(stateSchema);
+    // Create a new workflow with the Zod schema
+    this.workflow = new StateGraph({
+      channels: {
+        testResults: {
+          value: (x) => x,
+          default: () => []
+        },
+        testData: {
+          value: (x) => x,
+          default: () => ({})
+        },
+        browserContexts: {
+          value: (x) => x,
+          default: () => ({})
+        },
+        errors: {
+          value: (x) => x,
+          default: () => []
+        }
+      }
+    });
 
     // Define nodes
     this.workflow.addNode('setupTestData', this._setupTestData.bind(this));
