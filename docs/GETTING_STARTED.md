@@ -207,6 +207,3 @@ test('should run tests in parallel', async ({ browserManager }) => {
 - Customize the framework to fit your project's needs
 - Integrate with your CI/CD pipeline
 
-## Support
-
-For issues and feature requests, please [open an issue](https://github.com/your-org/playwright-mcp-framework/issues) on GitHub.

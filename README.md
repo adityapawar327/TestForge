@@ -31,8 +31,8 @@ An advanced, scalable, and maintainable test automation framework built with Pla
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/playwright-mcp-framework.git
-   cd playwright-mcp-framework
+   git clone https://github.com/adityapawar327/TestForge.git
+   cd TestForge
    ```
 
 2. **Install dependencies**
@@ -82,19 +82,11 @@ HEADLESS=false npx playwright test
 ├── .github/              # GitHub Actions workflows
 ├── config/               # Configuration files
 │   ├── mcp.config.js     # MCP client configuration
-│   └── test.config.js    # Test configuration
-├── docs/                 # Documentation
-│   ├── GETTING_STARTED.md
-│   └── API_REFERENCE.md
-├── fixtures/             # Test fixtures
-│   └── test.fixture.js   # Custom test fixtures
-├── orchestration/        # Test orchestration
-│   └── testOrchestrator.js # LangGraph-based test orchestrator
 ├── pages/                # Page Object Models
-├── reports/              # Test reports and artifacts
-├── tests/                # Test files
+├── tests/                # Test suites
 │   ├── examples/         # Example test cases
-│   └── *.spec.js         # Test suites
+│   ├── smoke/            # Smoke tests
+│   └── specs/            # Feature test suites
 ├── utils/                # Utility functions
 │   ├── browserManager.js # Browser management
 │   ├── testDataFactory.js # Test data generation
@@ -163,5 +155,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <div align="center">
-  Made with ❤️ by Your Team Name
+  Made with ❤️ by Aditya Pawar
 </div>
